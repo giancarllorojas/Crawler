@@ -27,8 +27,11 @@ class SqLite:
             return False
         return True
 
-    def saveUrls(self, category, urls):
+    def saveUrls(self, category, origin, urls):
         for url in urls:
             if(self.verifyUrl(url)):
-                self.cur.execute("INSERT INTO link VALUES(?, ?, ?, ?)", (url, category, 0, 0))
-                self.con.commit()
+                self.cur.execute("INSERT INTO link VALUES(?, ?, ?, ?, ?)", (url, category, origin, 0, 0))
+        self.con.commit()
+    
+    def close(self):
+        self.con.close()
