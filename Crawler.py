@@ -44,7 +44,7 @@ class Crawler(threading.Thread):
     def run(self):
         for p in range(self.start_page, self.end_page):
             url = self.url_start + str(p) + self.url_end
-            sys.stdout.write("Getting URL: " + url + "\n")
+            #sys.stdout.write("Getting URL: " + url + "\n")
             data = self.req.get(url)
             urls = self.parser.getLinks(data)
             page = Page(p, urls)
