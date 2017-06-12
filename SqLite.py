@@ -1,37 +1,49 @@
 import sqlite3
+import sys
+import threading
 
+bdLock = threading.Lock()
+
+"""
+SqLite Handler class
+"""
 class SqLite:
-    def __init__(self):
-        self.con = sqlite3.connect('database.db')
+    def __init__(self, category, parser):
+        conn_url = "databases/" + parser + "_" + category + ".db"
+        self.con = sqlite3.connect(conn_url)
         self.cur = self.con.cursor()
+        self.createTable()
 
-    #save to sqlite
-    def savePage(self, url, data, origin):
-        if(self.verifyPage(url)):
-            self.cur.execute("INSERT INTO page VALUES(?, ?, ?)", (url, origin, data))
+    def createTable(self):
+        try:
+            sql = "CREATE TABLE link ( 'url' TEXT UNIQUE,'category'	TEXT,'origin' TEXT, 'thumb' TEXT, 'fetched' INTEGER,'fetched_imgs'	INTEGER,PRIMARY KEY(url));"
+            self.cur.execute(sql)
+            self.cur.commit()
+        except:
+            pass
+
+    def saveUrls(self, category, origin, links):
+        insert_list = []
+        for link in links:
+            insert_list.append((link['url'], category, origin, link['thumb'], 0, 0))
+            
+        bdLock.acquire()
+        try:
+            self.cur.executemany("INSERT INTO link VALUES(?, ?, ?, ?, ?, ?)", insert_list)
             self.con.commit()
+        except Exception as e:
+            print(e)
+        bdLock.release()
 
-    #verify if a Page is already on the database
-    def verifyPage(self, url):
-        self.cur.execute("SELECT * FROM page where url = ?", (url))
-        data = self.cur.fetchall()
-        if(len(data) > 0):
-            return False
-        return True
+    def getUnfetchedLinks(self):
+        sql = "select * from link where fetched = 0"
+        return self.cur.execute(sql)
 
-    #verify if a URL is already on the database
-    def verifyUrl(self, url):
-        self.cur.execute("SELECT * FROM link where url = '" + url + "'")
-        data = self.cur.fetchall()
-        if(len(data) > 0):
-            return False
-        return True
+    def markAsFetched(self, url):
+        self.cur.execute('update link set fetched=1 where url="' + str(url) + '"')
 
-    def saveUrls(self, category, origin, urls):
-        for url in urls:
-            if(self.verifyUrl(url)):
-                self.cur.execute("INSERT INTO link VALUES(?, ?, ?, ?, ?)", (url, category, origin, 0, 0))
-        self.con.commit()
+    def commit(self):
+        self.con.commit()     
     
     def close(self):
         self.con.close()

@@ -1,0 +1,10 @@
+{
+    "category": "teen",
+    "parser": "Xvideos",
+    "num_threads": 4,
+    "num_consumers": 1,
+    "first_page": 0,
+    "total_pages": 5000,
+    "url_start": "https://www.xvideos.com/c/",
+    "url_end": "/teen-13"
+}

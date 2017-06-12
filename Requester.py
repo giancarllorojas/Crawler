@@ -14,4 +14,4 @@ class Requester:
         if(len(data) > 100):
             return data
         else:
-            print("Failed to get URL: " + url)
+            return None
