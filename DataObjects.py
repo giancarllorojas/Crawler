@@ -18,15 +18,17 @@ class Video():
             "up": 0,
             "down": 0
         }
-        
     
-    def save(self):
+    def to_dict(self):
         try:
             dict_obj = self.__dict__
             dict_obj['origin'] = self.origin.__dict__
-            MongoManager.con.insertVideo(dict_obj)
+            return dict_obj
         except Exception as e:
             print(e)
+
+    def __str__(self):
+        return self.url
 
 class Video_Origin():
     def __init__(self, name, views, upvotes, downvotes, vid_id):

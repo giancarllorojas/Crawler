@@ -3,8 +3,9 @@
     "parser": "Xvideos",
     "num_threads": 4,
     "num_consumers": 1,
-    "first_page": 0,
-    "total_pages": 5000,
+    "num_batch_insert": 1000,
+    "first_page": 5000,
+    "last_page": 10000,
     "url_start": "https://www.xvideos.com/c/",
     "url_end": "/teen-13"
 }

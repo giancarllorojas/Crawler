@@ -1,12 +1,16 @@
 import threading
 import queue
 from Requester import Requester
-from SqLite import SqLite
+from SqLite import liteQueue
+from SqLite import get_queue
 import sys
 import os
 import DataObjects
 
-q = queue.Queue()
+#memory queue
+q = queue.Queue(maxsize=1000)
+#sqlite queue
+sq = None
 dbLock = threading.Lock()
 sys.path.append('parsers')
 
@@ -14,20 +18,45 @@ class urlInserter(threading.Thread):
     """
     Thread class to be used as a consumer when fetching pages
     """
-    def __init__(self, category, parser):
+    def __init__(self, category, parser, num_batch, num_workers):
         super(urlInserter, self).__init__()
         self.category = category
         self.parser = parser
+        self.num_batch = num_batch
+        self.batch = []
+        self.num_workers = num_workers
         
     def run(self):
-        db = SqLite(self.category, self.parser)
+        sq = get_queue(self.category, self.parser)
+        workers_finished = 0
+        batches_inserted = 0
+        pages_inserted   = 0
         while True:
-            page = q.get()
-            sys.stdout.write("Saving page " + str(page.num) + " - Total: " + str(len(page.urls)) + "\n")
-            db.saveUrls(self.category, self.parser, page.urls)
-            #q.task_done()
+            page     = q.get()
+            url_list = []
+            #sys.stdout.write("Saving page " + str(page.num) + " - Total: " + str(len(page.urls)) + "\n")
+            if(page == None):
+                workers_finished += 1
+                sys.stdout.write("Worker finshed, total: " + str(workers_finished) + "\n")
+                if(workers_finished == self.num_workers):
+                    print("Finish line reached!")
+                    sq.put_many(self.batch)
+                    break
+                else:
+                    continue
 
-        db.close()
+            for url in page.urls:
+                obj = (url['url'], self.category, self.parser, url['thumb'], 0, 0)
+                self.batch.append(obj)
+            
+            pages_inserted += 1
+
+            #insert whole batch
+            if(len(self.batch) > self.num_batch):
+                sq.put_many(self.batch)
+                batches_inserted += 1
+                sys.stdout.write("Batch saved. Batches inserted: " + str(batches_inserted) + ", Total pages: " + str(pages_inserted) + "\n")
+                self.batch = []
 
 
 class Crawler(threading.Thread):
@@ -53,3 +82,5 @@ class Crawler(threading.Thread):
             urls = self.parser.getLinks(data)
             page = DataObjects.Page(p, urls)
             q.put(page)
+        sys.stdout.write("Sending poison, thread: " + str(threading.current_thread().ident) + "\n")
+        q.put(None)
