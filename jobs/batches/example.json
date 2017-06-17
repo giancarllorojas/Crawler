@@ -1,0 +1,12 @@
+{
+    "collection"        : "",   // Collection name
+    "category"          : "",   // Category of the parsed page
+    "parser"            : "",   // Name of the class to be used as parser
+    "num_threads"       : 4,    // Number of threads
+    "num_batch"         : 1000, // Number of itens to be inserted in a bulk
+    "first_page"        : 0,    // First page
+    "last_page"         : 250,  // Last page
+    "url_start"         : "",   // First part of the url, ex: https://www.google.com.br/?q=fd&start=
+    "url_end"           : ""    // Second part of the url, ex: #q=fd
+    // The page number will be inserted between the url_start and url_end
+}

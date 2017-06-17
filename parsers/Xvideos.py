@@ -3,6 +3,7 @@ import lxml
 import re
 import datetime
 import DataObjects
+from models.Video import Video
 
 
 base_url = 'https://www.xvideos.com'
@@ -56,13 +57,12 @@ def getInfoVideo(html, link):
     title = head.find('meta', {'property' : 'og:title'})['content']
 
     duration = int(head.find('meta', {'property' : 'og:duration'})['content'])
-    duration = str(datetime.timedelta(seconds=duration))
 
     vid_id = link[0].split('/')[3][5:]
     download_url = 'https://static-hw.xvideos.com/swf/xv-player.swf?id_video=' + vid_id
     embed = 'https://flashservice.xvideos.com/embedframe/' + vid_id
 
-    video = DataObjects.Video(link[0], title, duration, tags, views, up_ratings, down_ratings, vid_id, download_url, link[3], link[1], link[2])
+    video = Video(link[0], title, duration, tags, views, up_ratings, down_ratings, vid_id, download_url, link[3], link[1], link[2])
     return video
 
 def removeScript(v):

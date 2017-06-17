@@ -1,0 +1,8 @@
+{
+    "collection"    : "vagas",
+    "category"      : "empregos",
+    "parser"        : "Rjempregos",
+    "type"          : "Fetch",
+    "num_threads"   : 4,
+    "bulk_size"     : 10
+}

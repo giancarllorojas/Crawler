@@ -1,0 +1,12 @@
+{
+    "collection"        : "Vagas",
+    "category"          : "empregos",
+    "parser"            : "Rjempregos",
+    "type"              : "Batch",
+    "num_threads"       : 4,
+    "bulk_size"         : 100,
+    "first_page"        : 1,
+    "last_page"         : 250,
+    "url_start"         : "http://www.empregosrj.com/page/",
+    "url_end"           : "/"
+}

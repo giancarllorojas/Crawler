@@ -1,0 +1,7 @@
+{
+    "collection"    : "",  // Collection name
+    "category"      : "",  // Category of the inserted itens
+    "parser"        : "",  // Parser to be used
+    "num_threads"   : 4,   // Number of threads
+    "bulk_size"     : 100, // Size of the bulk in the insertion
+}

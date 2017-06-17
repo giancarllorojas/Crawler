@@ -2,22 +2,21 @@ import threading
 import json
 import sys
 
-from Crawler import Crawler
-from Crawler import urlInserter
+from classes.Crawler import Crawler
+from classes.Crawler import urlInserter
 
 if(len(sys.argv) < 2):
-    print("Run with: Batch.py config_name")
+    print("Run with: Batch.py job_name.json")
     sys.exit()
 
-config = json.loads(open("batches/" + sys.argv[1] + ".json", "r").read())
+config = json.loads(open("jobs/batches/" + sys.argv[1] + ".json", "r").read())
 
 threads = []
-consumers = []
             
 
-for i in range(0, config['num_consumers']):
-    consumers.append(urlInserter(config['category'], config['parser'], config['num_batch_insert'], config['num_threads']))
-    consumers[i].start()
+#Start consumer class
+consumer = urlInserter(config['category'], config['parser'], config['bulk_size'], config['num_threads'])
+consumer.start()
 
 for i in range(0, config['num_threads']):
     total_pages = int(config['last_page'] - config['first_page'])
@@ -33,5 +32,7 @@ for i in range(0, config['num_threads']):
 
 for thread in threads:
     thread.join()
-for consumer in consumers:
-    consumer.join()
+
+consumer.join()
+
+print("Job batch finished: " + config['parser'] + " " + config['category'])
